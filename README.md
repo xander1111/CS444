@@ -5,6 +5,7 @@ Contains all the projects for my CS444 class
 
 Command line:
 * `make <project name>` to make a specific project
+* `make` or `make all` to build all projects
 * Project executables get built to `build/`, note that the executable name may differ from the project name
 
 
