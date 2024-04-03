@@ -5,7 +5,7 @@
 void *print_message(void *arg)
 {
     char* message = arg;
-    for (int i = 1; i <= 4; i++)
+    for (int i = 0; i <= 4; i++)
     {
         printf("%s: %d\n", message, i);
     }
