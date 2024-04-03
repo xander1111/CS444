@@ -1,8 +1,8 @@
 CC=gcc
 CCOPTS= -Wall -Wextra -Werror
 
-hellothread: Project1/hellothread.c
-	$(CC) $(CCOPTS) -o build/$@ $<
+project1: Project1/hellothread.c
+	$(CC) $(CCOPTS) -o build/hellothread $<
 
 scratch: scratch.c
 	$(CC) $(CCOPTS) -o build/$@ $<
