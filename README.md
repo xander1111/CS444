@@ -10,7 +10,7 @@ Command line:
 
 ## Files
 
-* `Project1/hellothread.c`: Main code for project1
+* `project1/hellothread.c`: Main code for project1
 
 
 ## Data
