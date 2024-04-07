@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS= -Wall -Wextra -Werror
+CCOPTS= -Wall -Wextra -Werror -lpthread
 
 all:
 	make project1
