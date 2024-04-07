@@ -4,10 +4,9 @@
 
 void *print_message(void *arg)
 {
-    char* message = arg;
     for (int i = 0; i <= 4; i++)
     {
-        printf("%s: %d\n", message, i);
+        printf("%s: %d\n", (char *) arg, i);
     }
 
     return NULL;
@@ -20,10 +19,9 @@ int main(int argc, char const *argv[])
 
     puts("Launching threads");
 
-    pthread_t thread_1;
-    pthread_create(&thread_1, NULL, print_message, "thread 1");
+    pthread_t thread_1, thread_2;
 
-    pthread_t thread_2;
+    pthread_create(&thread_1, NULL, print_message, "thread 1");
     pthread_create(&thread_2, NULL, print_message, "thread 2");
 
     pthread_join(thread_1, NULL);
