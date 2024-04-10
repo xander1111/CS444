@@ -1,5 +1,5 @@
 build/*
 !build/.gitkeep
-scratch.c
+scratch*
 project1/hellothread
 project2/reservations
