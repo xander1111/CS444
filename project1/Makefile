@@ -3,9 +3,8 @@ CCOPTS= -Wall -Wextra -Werror -lpthread
 
 .PHONY: all
 
-all: 
-	$(MAKE) -C project1 all
-	$(MAKE) -C project2 all
+all: hellothread
 
-scratch: scratch.c
+hellothread: hellothread.c
 	$(CC) $(CCOPTS) -o $@ $<
+

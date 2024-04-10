@@ -1,3 +1,5 @@
 build/*
 !build/.gitkeep
 scratch.c
+project1/hellothread
+project2/reservations
