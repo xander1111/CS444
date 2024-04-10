@@ -6,28 +6,25 @@ Contains all the projects for my CS444 class
 Command line:
 * `make <project name>` to make a specific project
 * `make` or `make all` to build all projects
-* Project executables get built to `build/`, note that the executable name may differ from the project name
+* `make` or `make all` from within a project directory also works
 
 
 ## Files
 
-* `project1/hellothread.c`: Main code for project1
+* See each project's README for file info
 
 
 ## Data
 
-### Project1
-N/A
+* See each project's README for data info
 
 
 ## Functions
 
-### Project1
-* `main()`
-    * `print_message()`: Prints the given message 5 times
+* See each project's README for function info
 
 
 ## Notes
 
-
+None
 
