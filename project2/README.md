@@ -5,7 +5,7 @@ Contains project 2 of my CS444 class
 
 Command line:
 * `make` or `make all` to build
-* Produces an executable named `rersevations`
+* Produces an executable named `reservations`
 
 
 ## Files
