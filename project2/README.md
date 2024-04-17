@@ -5,12 +5,12 @@ Contains project 2 of my CS444 class
 
 Command line:
 * `make` or `make all` to build
-* Produces an executable named `resevations`
+* Produces an executable named `rersevations`
 
 
 ## Files
 
-* `reservations.c`: Main code for project 1
+* `reservations.c`: Main code for project 2
 
 
 ## Data
@@ -21,8 +21,11 @@ Includes an array of booleans/ints, the size of which is determined by command l
 ## Functions
 
 * `main()`
-    * `print_message()`: Prints the given message 5 times
-
+    * `is_free()` - Checks whether a seat is free or not, not thread safe
+    * `reserve_seat()` - Marks a seat as reserved, thread safe
+    * `free_seat()` - Marks a seat as free, thread safe
+    * `verify_seat_count()` - Checks whether the number of seats reserved in the seat array matches the number of seats claimed by brokers
+    * `seat_broker()` - Runs a seat broker; randomly reserves and frees seats.
 
 ## Notes
 None
