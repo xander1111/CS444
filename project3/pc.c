@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <semaphore.h>
+#include <pthread.h>
 
 #include "eventbuf.h"
 
@@ -12,6 +13,11 @@ int max_events;
 
 struct eventbuf *buffer;
 
+
+void *producer(void *arg) {
+    (void)arg;
+    return NULL;
+}
 
 int main(int argc, char const *argv[])
 {
@@ -28,8 +34,15 @@ int main(int argc, char const *argv[])
 
     buffer = eventbuf_create();
 
+    pthread_t prod_threads[prod_count];
+    int prod_thread_ids[prod_count];
 
+    // pthread_t cons_threads[cons_count];
+    // int cons_thread_ids[cons_count];
 
+    for (int i = 0; i < prod_count; i++)
+        pthread_create(prod_threads + i, NULL, producer, prod_thread_ids + i);
+    
     free(buffer);
 
     return 0;
