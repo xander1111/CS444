@@ -48,8 +48,15 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < prod_count; i++)
         pthread_create(prod_threads + i, NULL, producer, prod_thread_ids + i);
 
-    for (int i = 0; i < prod_count; i++)
+    for (int i = 0; i < cons_count; i++)
         pthread_create(cons_threads + i, NULL, consumer, cons_thread_ids + i);
+
+
+    for (int i = 0; i < prod_count; i++)
+        pthread_join(*(prod_threads + i), NULL);
+
+    for (int i = 0; i < cons_count; i++)
+        pthread_join(*(cons_threads + i), NULL);
     
     free(buffer);
 
