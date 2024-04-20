@@ -19,6 +19,11 @@ void *producer(void *arg) {
     return NULL;
 }
 
+void *consumer(void *arg) {
+    (void)arg;
+    return NULL;
+}
+
 int main(int argc, char const *argv[])
 {
     if (argc != 5)
@@ -37,11 +42,14 @@ int main(int argc, char const *argv[])
     pthread_t prod_threads[prod_count];
     int prod_thread_ids[prod_count];
 
-    // pthread_t cons_threads[cons_count];
-    // int cons_thread_ids[cons_count];
+    pthread_t cons_threads[cons_count];
+    int cons_thread_ids[cons_count];
 
     for (int i = 0; i < prod_count; i++)
         pthread_create(prod_threads + i, NULL, producer, prod_thread_ids + i);
+
+    for (int i = 0; i < prod_count; i++)
+        pthread_create(cons_threads + i, NULL, consumer, cons_thread_ids + i);
     
     free(buffer);
 
