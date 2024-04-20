@@ -5,8 +5,8 @@ CCOPTS= -Wall -Wextra -Werror -lpthread
 
 all: pc
 
-pc: pc.c
-	$(CC) $(CCOPTS) -o $@ $<
+pc: pc.c eventbuf.c
+	$(CC) $(CCOPTS) -o $@ $^
 
 
 

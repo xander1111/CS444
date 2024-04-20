@@ -10,6 +10,8 @@ int cons_count;
 int event_create_count;
 int max_events;
 
+struct eventbuf *buffer;
+
 
 int main(int argc, char const *argv[])
 {
@@ -24,6 +26,11 @@ int main(int argc, char const *argv[])
     event_create_count = atoi(argv[3]);
     max_events = atoi(argv[4]);
 
+    buffer = eventbuf_create();
+
+
+
+    free(buffer);
 
     return 0;
 }
