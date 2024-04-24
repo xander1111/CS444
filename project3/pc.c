@@ -46,9 +46,10 @@ void *producer(void *arg) {
     {
         sem_wait(prod_sem);  // Check if there is space in the buffer
 
-        sem_wait(buffer_lock);
         int event_id = id * 100 + i;
         printf("P%d: adding event %d\n", id, event_id);
+
+        sem_wait(buffer_lock);
         eventbuf_add(buffer, event_id);
         sem_post(buffer_lock);
 
