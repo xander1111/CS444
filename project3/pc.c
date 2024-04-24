@@ -42,7 +42,7 @@ sem_t *sem_open_temp(const char *name, unsigned int value)
 void *producer(void *arg) {
     int id = *((int*)arg);
 
-    for (int i = 0; i <= 4; i++)
+    for (int i = 0; i < event_create_count; i++)
     {
         sem_wait(prod_sem);  // Check if there is space in the buffer
 
