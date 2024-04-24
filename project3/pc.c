@@ -12,8 +12,6 @@ int cons_count;
 int event_create_count;
 int max_events;
 
-unsigned short exiting = 0;
-
 struct eventbuf *buffer;
 sem_t *buffer_lock;
 
@@ -62,7 +60,27 @@ void *producer(void *arg) {
 }
 
 void *consumer(void *arg) {
-    (void)arg;
+    int id = *((int*)arg);
+    int event_id;
+
+    while (1)
+    {
+        sem_wait(cons_sem);  // Check if there are items in the buffer to be consumed
+
+        if (eventbuf_empty(buffer))
+            break;  // The event buffer will only ever be empty at this point if something wasn't added when
+                    // the semaphore was posted to, i.e. the main thread signaled to exit
+
+        sem_wait(buffer_lock);
+        event_id = eventbuf_get(buffer);
+        sem_post(buffer_lock);
+
+        printf("C%d: got event %d\n", id, event_id);
+        sem_post(prod_sem);
+    }
+
+    printf("C%d: exiting\n", id);
+
     return NULL;
 }
 
@@ -108,9 +126,12 @@ int main(int argc, char const *argv[])
         pthread_join(*(prod_threads + i), NULL);
 
     for (int i = 0; i < cons_count; i++)
+        sem_post(cons_sem);
+
+    for (int i = 0; i < cons_count; i++)
         pthread_join(*(cons_threads + i), NULL);
     
-    free(buffer);
+    eventbuf_free(buffer);
 
     return 0;
 }
