@@ -54,6 +54,8 @@ void *producer(void *arg) {
 
         sem_post(cons_sem);
     }
+
+    printf("P%d: exiting\n", id);
     
     return NULL;
 }
