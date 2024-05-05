@@ -7,6 +7,7 @@ all:
 	$(MAKE) -C project1 all
 	$(MAKE) -C project2 all
 	$(MAKE) -C project3 all
+	$(MAKE) -C vvsfs all
 
 scratch: scratch.c
 	$(CC) $(CCOPTS) -o $@ $<
