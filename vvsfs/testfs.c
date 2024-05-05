@@ -9,7 +9,7 @@ int main(void)
 {
     CTEST_VERBOSE(1);
 
-    image_open("./test.txt", 1);
+    image_open("./scratch.txt", 1);
 
     image_close();
 
