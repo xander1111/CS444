@@ -5,4 +5,7 @@ project1/hellothread
 project2/reservations
 project3/pc
 vvsfs/testfs
+test.txt
+
 *.o
+*.a

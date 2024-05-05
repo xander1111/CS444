@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int image_fd;
+int image_fd = 0;
 
 int image_open(char *filename, int truncate)
 {
