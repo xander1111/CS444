@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "ctest.h"
+#include "image.h"
 
 #ifdef CTEST_ENABLE
 
@@ -8,7 +9,9 @@ int main(void)
 {
     CTEST_VERBOSE(1);
 
-    // Run tests
+    image_open("./test.txt", 1);
+
+    image_close();
 
     CTEST_RESULTS();
 

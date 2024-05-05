@@ -3,10 +3,10 @@ CCOPTS= -Wall -Wextra -Werror
 
 .PHONY: all
 
-all: testfs.o
+all: testfs.o image.o
 	$(CC) -o testfs $^
 
-testfs.o: testfs.c ctest.h
+testfs.o: testfs.c ctest.h image.h
 	$(CC) $(CCOPTS) -DCTEST_ENABLE -c $^
 
 image.o: image.c
