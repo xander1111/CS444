@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS= -Wall -Wextra -Werror -lpthread
+CCOPTS= -Wall -Wextra -Werror
 
 .PHONY: all
 
@@ -8,6 +8,9 @@ all: testfs.o
 
 testfs.o: testfs.c ctest.h
 	$(CC) $(CCOPTS) -DCTEST_ENABLE -c $^
+
+image.o: image.c
+	$(CC) $(CCOPTS) -c $^
 
 clean:
 	rm -f *.o *.a
