@@ -1,7 +1,7 @@
 CC=gcc
 CCOPTS= -Wall -Wextra -Werror
 
-.PHONY: all
+.PHONY: all, clean, pristine
 
 all: testfs.o libvvsfs.a
 	$(CC) -o testfs $^
