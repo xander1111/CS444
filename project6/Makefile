@@ -1,10 +1,13 @@
 CC=gcc
 CCOPTS= -Wall -Wextra -Werror
 
-.PHONY: all, clean, pristine
+.PHONY: all, clean, pristine, test
 
 all: testfs.o libvvsfs.a
 	$(CC) -o testfs $^
+
+test: all
+	./testfs
 
 testfs.o: testfs.c ctest.h image.h block.h
 	$(CC) $(CCOPTS) -DCTEST_ENABLE -c $<
