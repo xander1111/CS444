@@ -24,17 +24,17 @@ void test_block_read(void)
 {
     image_open("./test.txt", 1);
 
-    unsigned char buf[4096] = {0};
-    for (int i = 0; i < 4096; i++)
+    unsigned char buf[BLOCK_SIZE] = {0};
+    for (int i = 0; i < BLOCK_SIZE; i++)
         buf[i] = i % 256;
     
     lseek(image_fd, 0, SEEK_SET);
-    write(image_fd, buf, 4096);
+    write(image_fd, buf, BLOCK_SIZE);
 
-    unsigned char read_data[4096] = {0};
+    unsigned char read_data[BLOCK_SIZE] = {0};
     
     CTEST_ASSERT(bread(0, read_data) == read_data, "bread returns pointer to the buffer given");
-    CTEST_ASSERT(memcmp(buf, read_data, 4096) == 0, "bread reads data into the buffer given");
+    CTEST_ASSERT(memcmp(buf, read_data, BLOCK_SIZE) == 0, "bread reads data into the buffer given");
 
     image_close();
 }
@@ -43,15 +43,15 @@ void test_block_write(void)
 {
     image_open("./test.txt", 1);
 
-    unsigned char buf[4096] = {0};
-    for (int i = 0; i < 4096; i++)
+    unsigned char buf[BLOCK_SIZE] = {0};
+    for (int i = 0; i < BLOCK_SIZE; i++)
         buf[i] = i % 256;
        
     bwrite(0, buf);
 
-    unsigned char read_data[4096] = {0};
+    unsigned char read_data[BLOCK_SIZE] = {0};
     bread(0, read_data);
-    CTEST_ASSERT(memcmp(buf, read_data, 4096) == 0, "bwrite writes data");
+    CTEST_ASSERT(memcmp(buf, read_data, BLOCK_SIZE) == 0, "bwrite writes data");
 
     image_close();
 }
