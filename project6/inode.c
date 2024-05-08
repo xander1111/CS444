@@ -3,30 +3,26 @@
 #include "block.h"
 #include "free.h"
 
-int ialloc(void)
+int alloc_block(int block_index)
 {
-    unsigned char free_block[4096];
-    bread(INODE_FREE_BLOCK, free_block);
+    unsigned char free_block[BLOCK_SIZE];
+    bread(block_index, free_block);
 
     int first_free_index = find_free(free_block);
 
     set_free(free_block, first_free_index, 1);
 
-    bwrite(INODE_FREE_BLOCK, free_block);
+    bwrite(block_index, free_block);
 
     return first_free_index;
 }
 
+int ialloc(void)
+{
+    return alloc_block(INODE_FREE_BLOCK);
+}
+
 int alloc(void)
 {
-    unsigned char free_block[4096];
-    bread(DATA_FREE_BLOCK, free_block);
-
-    int first_free_index = find_free(free_block);
-
-    set_free(free_block, first_free_index, 1);
-
-    bwrite(DATA_FREE_BLOCK, free_block);
-
-    return first_free_index;
+    return alloc_block(DATA_FREE_BLOCK);
 }
