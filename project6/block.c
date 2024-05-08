@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include "image.h"
+#include "free.h"
 
 unsigned char *bread(int block_num, unsigned char *block)
 {
@@ -19,4 +20,9 @@ void bwrite(int block_num, unsigned char *block)
 
     lseek(image_fd, byte_offset, SEEK_SET);
     write(image_fd, block, BLOCK_SIZE);
+}
+
+int alloc(void)
+{
+    return alloc_block(DATA_FREE_BLOCK);
 }
