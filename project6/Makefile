@@ -9,10 +9,10 @@ all: testfs.o libvvsfs.a
 test: all
 	./testfs
 
-testfs.o: testfs.c ctest.h image.h block.h free.h
+testfs.o: testfs.c ctest.h image.h block.h free.h inode.h
 	$(CC) $(CCOPTS) -DCTEST_ENABLE -c $<
 
-libvvsfs.a: image.o block.o free.o
+libvvsfs.a: image.o block.o free.o inode.o
 	ar rcs $@ $^
 
 image.o: image.c
@@ -22,6 +22,9 @@ block.o: block.c
 	$(CC) $(CCOPTS) -c $<
 
 free.o: free.c
+	$(CC) $(CCOPTS) -c $<
+
+inode.o: inode.c
 	$(CC) $(CCOPTS) -c $<
 
 clean:

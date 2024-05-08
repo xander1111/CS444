@@ -6,6 +6,7 @@
 #include "image.h"
 #include "block.h"
 #include "free.h"
+#include "inode.h"
 
 
 #ifdef CTEST_ENABLE
@@ -98,6 +99,23 @@ void test_find_free(void)
     CTEST_ASSERT(find_free(block) == bit_num, "find_free returns the index of the first 0 bit");
 }
 
+void test_ialloc(void)
+{
+    image_open("./test.txt", 1);
+
+    int bit_num = 321;
+    unsigned char block[BLOCK_SIZE] = {0};
+    for (int i = 0; i < BLOCK_SIZE; i++)
+        block[i] = 0xFF;
+
+    set_free(block, bit_num, 0);
+    bwrite(INODE_FREE_BLOCK, block);  // inode free block gets set to all 1s, except for bit 321
+
+    CTEST_ASSERT(ialloc() == bit_num, "ialloc allocates the first free inode");
+
+    image_close();
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -111,6 +129,8 @@ int main(void)
     test_set_free();
     test_set_free_to_0();
     test_find_free();
+
+    test_ialloc();
 
     CTEST_RESULTS();
 
