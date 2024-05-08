@@ -19,5 +19,14 @@ int ialloc(void)
 
 int alloc(void)
 {
-    return 0;
+    unsigned char free_block[4096];
+    bread(DATA_FREE_BLOCK, free_block);
+
+    int first_free_index = find_free(free_block);
+
+    set_free(free_block, first_free_index, 1);
+
+    bwrite(DATA_FREE_BLOCK, free_block);
+
+    return first_free_index;
 }

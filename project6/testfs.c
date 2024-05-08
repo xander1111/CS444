@@ -116,6 +116,53 @@ void test_ialloc(void)
     image_close();
 }
 
+void test_ialloc_fail(void)
+{
+    image_open("./test.txt", 1);
+
+    unsigned char block[BLOCK_SIZE] = {0};
+    for (int i = 0; i < BLOCK_SIZE; i++)
+        block[i] = 0xFF;
+
+    bwrite(INODE_FREE_BLOCK, block);  // inode free block gets set to all 1s
+
+    CTEST_ASSERT(ialloc() == -1, "ialloc returns -1 if there are no free inodes");
+
+    image_close();
+}
+
+void test_alloc(void)
+{
+    image_open("./test.txt", 1);
+
+    int bit_num = 321;
+    unsigned char block[BLOCK_SIZE] = {0};
+    for (int i = 0; i < BLOCK_SIZE; i++)
+        block[i] = 0xFF;
+
+    set_free(block, bit_num, 0);
+    bwrite(DATA_FREE_BLOCK, block);  // data free block gets set to all 1s, except for bit 321
+
+    CTEST_ASSERT(alloc() == bit_num, "alloc allocates the first free data block");
+
+    image_close();
+}
+
+void test_alloc_fail(void)
+{
+    image_open("./test.txt", 1);
+
+    unsigned char block[BLOCK_SIZE] = {0};
+    for (int i = 0; i < BLOCK_SIZE; i++)
+        block[i] = 0xFF;
+
+    bwrite(DATA_FREE_BLOCK, block);  // data free block gets set to all 1s
+
+    CTEST_ASSERT(alloc() == -1, "alloc returns -1 if there are no free data blocks");
+
+    image_close();
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -131,6 +178,10 @@ int main(void)
     test_find_free();
 
     test_ialloc();
+    test_ialloc_fail();
+
+    test_alloc();
+    test_alloc_fail();
 
     CTEST_RESULTS();
 
