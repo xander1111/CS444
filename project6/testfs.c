@@ -87,7 +87,15 @@ void test_set_free_to_0(void)
 
 void test_find_free(void)
 {
+    int bit_num = 123;
+    
+    unsigned char block[BLOCK_SIZE] = {0};
+    for (int i = 0; i < BLOCK_SIZE; i++)
+        block[i] = 0xFF;
 
+    set_free(block, bit_num, 0);
+
+    CTEST_ASSERT(find_free(block) == bit_num, "find_free returns the index of the first 0 bit");
 }
 
 int main(void)
