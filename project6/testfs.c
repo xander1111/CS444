@@ -5,6 +5,7 @@
 #include "ctest.h"
 #include "image.h"
 #include "block.h"
+#include "free.h"
 
 
 #ifdef CTEST_ENABLE
@@ -56,6 +57,39 @@ void test_block_write(void)
     image_close();
 }
 
+void test_set_free(void)
+{
+    int bit_num = 100;
+    int byte = bit_num / 8;
+    int bit_in_byte = bit_num % 8;
+    
+    unsigned char block[BLOCK_SIZE] = {0};
+
+    set_free(block, bit_num, 1);
+
+    CTEST_ASSERT((block[byte] & 1 << bit_in_byte) >> bit_in_byte, "set_free can set a bit to 1 at the specified location");
+}
+
+void test_set_free_to_0(void)
+{
+    int bit_num = 100;
+    int byte = bit_num / 8;
+    int bit_in_byte = bit_num % 8;
+    
+    unsigned char block[BLOCK_SIZE] = {0};
+    for (int i = 0; i < BLOCK_SIZE; i++)
+        block[i] = 0xFF;
+
+    set_free(block, bit_num, 0);
+
+    CTEST_ASSERT(!((block[byte] & 1 << bit_in_byte) >> bit_in_byte), "set_free can set a bit to 0 at the specified location");
+}
+
+void test_find_free(void)
+{
+
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -65,6 +99,10 @@ int main(void)
 
     test_block_read();
     test_block_write();
+
+    test_set_free();
+    test_set_free_to_0();
+    test_find_free();
 
     CTEST_RESULTS();
 
