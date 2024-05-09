@@ -38,6 +38,10 @@ int alloc_block(int block_index)
 
     int first_free_index = find_free(free_block);
 
+    if (first_free_index == -1)  
+        // No free block found, don't try to write to index -1
+        return -1;
+
     set_free(free_block, first_free_index, 1);
 
     bwrite(block_index, free_block);
