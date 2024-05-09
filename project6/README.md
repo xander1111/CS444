@@ -24,11 +24,22 @@ A file (name is provided to the library, `test.txt` is used in the test suite) t
 
 ## Functions
 
-* `image_open()` - Opens the specified image file
-* `image_close()` - Closes the currently open image file
+* `image.h`
+    * `image_open()` - Opens the specified image file
+    * `image_close()` - Closes the currently open image file
 
-* `bread()` - Reads data from the currently open image into the given buffer
-* `bwrite()` - Writes data from the given buffer into the currently open image
+* `block.h`
+    * `bread()` - Reads data from the currently open image into the given buffer
+    * `bwrite()` - Writes data from the given buffer into the currently open image
+    * `alloc()` - Allocates a data block and returns the block number of the allocated block
+
+* `free.h`
+    * `set_free()` - Sets whether a certain block is marked as free or not within a free map
+    * `find_free()` - Finds the first free block within a free map
+    * `alloc_block()` - Finds and allocates the first free block within a free map, returns the block number of the allocated block
+
+* `inode.h`
+    * `ialloc()` - Allocates an inode block and returns the block number of the allocated block
 
 ## Notes
 None
