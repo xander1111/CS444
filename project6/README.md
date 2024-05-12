@@ -5,6 +5,7 @@ Contains the file system project of my CS444 class. VVSFS is short for Very very
 
 Command line:
 * `make` or `make all` to build the library and test suite, produces an executable named `testfs`
+* `make test` to build and run the library and test suite
 * `make libvvsfs.a` to build the library by itself
 * `make clean` to remove build objects
 * `make pristine` to remove all build products
