@@ -4,9 +4,7 @@ scratch*
 project1/hellothread
 project2/reservations
 project3/pc
-project5/testfs
-project6/testfs
-project7/testfs
+*/testfs
 test.txt
 
 *.o
