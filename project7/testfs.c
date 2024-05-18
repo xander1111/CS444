@@ -206,6 +206,107 @@ void test_incore_find_null(void)
     CTEST_ASSERT(incore_find(1) == NULL, "incore_find returns NULL if the given inode number is not in memory");
 }
 
+void test_write_inode(void)
+{
+    image_open("./test.txt", 1);
+    incore_free_all();
+
+    unsigned char block_buf[BLOCK_SIZE] = {0};
+    
+    unsigned char i[] = {
+        0xAA, 0xBB, 0xCC, 0xDD,     // size
+        0x1A, 0x1B,                 // owner_id
+        0x10,                       // permissions
+        0xAB,                       // flags
+        0x20,                       // link_count
+        0x01, 0x01,                 // block pointers
+        0x02, 0x02, 
+        0x03, 0x03,
+        0x04, 0x04,
+        0x05, 0x05,
+        0x06, 0x06,
+        0x07, 0x07,
+        0x08, 0x08,
+        0x09, 0x09,
+        0x0A, 0x0A,
+        0x0B, 0x0B,
+        0x0C, 0x0C,
+        0x0D, 0x0D,
+        0x0E, 0x0E,
+        0x0F, 0x0F,
+        0x10, 0x10
+    };
+    memcpy(block_buf + 3 * INODE_SIZE, i, 41);  // only 41 of the allocated 64 bytes are used
+
+    struct inode *incore = incore_find_free();
+    incore->size = 0xAABBCCDD;
+    incore->owner_id = 0x1A1B;
+    incore->permissions = 0x10;
+    incore->flags = 0xAB;
+    incore->link_count = 0x20;
+
+    for (int i = 0; i < INODE_POINTER_COUNT; i++)
+        incore->block_ptr[i] = 0x0101 * (i + 1);
+    
+    incore->ref_count = 0;
+    incore->inode_num = 3;
+
+    write_inode(incore);
+
+    unsigned char read_data[BLOCK_SIZE] = {0};
+    bread(INODE_BLOCK_START, read_data);
+
+    CTEST_ASSERT(memcmp(block_buf, read_data, BLOCK_SIZE) == 0, "write_inode can write an inode to disk");
+}
+
+void test_read_inode(void)
+{
+    image_open("./test.txt", 1);
+    incore_free_all();
+
+    unsigned char block_buf[BLOCK_SIZE] = {0};
+    
+    unsigned char i[] = {
+        0xAA, 0xBB, 0xCC, 0xDD,     // size
+        0x1A, 0x1B,                 // owner_id
+        0x10,                       // permissions
+        0xAB,                       // flags
+        0x20,                       // link_count
+        0x01, 0x01,                 // block pointers
+        0x02, 0x02, 
+        0x03, 0x03,
+        0x04, 0x04,
+        0x05, 0x05,
+        0x06, 0x06,
+        0x07, 0x07,
+        0x08, 0x08,
+        0x09, 0x09,
+        0x0A, 0x0A,
+        0x0B, 0x0B,
+        0x0C, 0x0C,
+        0x0D, 0x0D,
+        0x0E, 0x0E,
+        0x0F, 0x0F,
+        0x10, 0x10
+    };
+    memcpy(block_buf + 3 * INODE_SIZE, i, 41);  // only 41 of the allocated 64 bytes are used
+    bwrite(INODE_BLOCK_START, block_buf);
+
+    struct inode to_read;
+    read_inode(&to_read, 3);
+
+    unsigned char has_same_data = to_read.size == 2864434397 &&  // 0xAABBCCDD
+    to_read.owner_id == 6683 &&  // 0x1A1B
+    to_read.permissions == 0x10 &&
+    to_read.flags == 0xAB &&
+    to_read.link_count == 0x20;
+
+    for (int i = 0; i < INODE_POINTER_COUNT; i++)
+        has_same_data &= to_read.block_ptr[i] == 0x0101 * (i + 1);
+
+    CTEST_ASSERT(has_same_data, "read_inode can be used to read inodes from disk");
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -231,6 +332,9 @@ int main(void)
 
     test_incore_find();
     test_incore_find_null();
+
+    test_write_inode();
+    test_read_inode();
 
     CTEST_RESULTS();
 

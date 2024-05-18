@@ -11,12 +11,12 @@
 
 struct inode
 {
-    unsigned int size;
-    unsigned short owner_id;
-    unsigned char permissions;
-    unsigned char flags;
-    unsigned char link_count;
-    unsigned short block_ptr[INODE_POINTER_COUNT];
+    unsigned int size;                              // offset 0
+    unsigned short owner_id;                        // offset 4
+    unsigned char permissions;                      // offset 6
+    unsigned char flags;                            // offset 7
+    unsigned char link_count;                       // offset 8
+    unsigned short block_ptr[INODE_POINTER_COUNT];  // offsets 9-39 (inclusive), 2 bytes per pointer
 
     unsigned int ref_count;  // in-core only
     unsigned int inode_num;  // in-core only
@@ -24,8 +24,13 @@ struct inode
 
 
 int ialloc(void);
+
 struct inode *incore_find_free(void);
 struct inode *incore_find(unsigned int inode_num);
+
 void incore_free_all(void);
+
+void read_inode(struct inode *in, int inode_num);
+void write_inode(struct inode *in);
 
 #endif

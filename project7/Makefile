@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS= -Wall -Wextra -Werror
+CCOPTS= -Wall -Wextra -Werror -g
 
 .PHONY: all, clean, pristine, test
 
@@ -9,10 +9,13 @@ all: testfs.o libvvsfs.a
 test: all
 	./testfs
 
+debug: testfs.o image.o block.o free.o inode.o pack.o
+	$(CC) $(CCOPTS) -g -o testfs_debug $^
+
 testfs.o: testfs.c ctest.h image.h block.h free.h inode.h
 	$(CC) $(CCOPTS) -DCTEST_ENABLE -c $<
 
-libvvsfs.a: image.o block.o free.o inode.o
+libvvsfs.a: image.o block.o free.o inode.o pack.o
 	ar rcs $@ $^
 
 image.o: image.c
@@ -25,6 +28,9 @@ free.o: free.c
 	$(CC) $(CCOPTS) -c $<
 
 inode.o: inode.c
+	$(CC) $(CCOPTS) -c $<
+
+pack.o: pack.c
 	$(CC) $(CCOPTS) -c $<
 
 clean:
