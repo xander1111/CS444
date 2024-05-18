@@ -37,4 +37,4 @@ clean:
 	rm -f *.o
 
 pristine: clean
-	rm -f testfs *.a
+	rm -f testfs test.txt testfs_debug *.a
