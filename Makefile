@@ -9,6 +9,7 @@ all:
 	$(MAKE) -C project3 all
 	$(MAKE) -C project5 all
 	$(MAKE) -C project6 all
+	$(MAKE) -C project7 all
 
 scratch: scratch.c
 	$(CC) $(CCOPTS) -o $@ $<
