@@ -31,7 +31,7 @@ int find_free(unsigned char *block)
     return -1;
 }
 
-int alloc_free(int block_index)
+int alloc_block(int block_index)
 {
     unsigned char free_block[BLOCK_SIZE];
     bread(block_index, free_block);
