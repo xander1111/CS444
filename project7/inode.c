@@ -19,3 +19,12 @@ struct inode *incore_find_free(void)
     
     return NULL;
 }
+
+struct inode *incore_find(unsigned int inode_num)
+{
+    for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
+        if (incore[i].inode_num == inode_num && incore[i].ref_count > 0)
+            return incore + i;
+
+    return NULL;
+}

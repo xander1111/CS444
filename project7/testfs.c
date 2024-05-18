@@ -183,6 +183,20 @@ void test_incore_find_free_null(void)
     CTEST_ASSERT(incore_find_free() == NULL, "incore_find_free returns NULL if no inodes are free");
 }
 
+void test_incore_find(void)
+{
+    incore_find_free()->inode_num = 1;
+    incore_find_free()->inode_num = 2;
+
+    CTEST_ASSERT(incore_find(1)->inode_num == 1, "incore_find returns the incore inode with the given inode number");
+    CTEST_ASSERT(incore_find(2)->inode_num == 2, "incore_find returns the incore inode with the given inode number");
+}
+
+void test_incore_find_null(void)
+{
+    CTEST_ASSERT(incore_find(1) == NULL, "incore_find returns NULL if the given inode number is not in memory");
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -205,6 +219,9 @@ int main(void)
 
     test_incore_find_free();
     test_incore_find_free_null();
+
+    test_incore_find();
+    test_incore_find_null();
 
     CTEST_RESULTS();
 
