@@ -163,6 +163,26 @@ void test_alloc_fail(void)
     image_close();
 }
 
+void test_incore_find_free(void)
+{
+    struct inode *inode = incore_find_free();
+
+    CTEST_ASSERT(inode->ref_count == 0, "incore_find_free returns an inode that is not in use");
+}
+
+void test_incore_find_free_null(void)
+{
+    struct inode *inode = incore_find_free();
+
+    for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
+    {
+        inode = incore_find_free();
+        inode->ref_count = 1;
+    }
+
+    CTEST_ASSERT(incore_find_free() == NULL, "incore_find_free returns NULL if no inodes are free");
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -182,6 +202,9 @@ int main(void)
 
     test_alloc();
     test_alloc_fail();
+
+    test_incore_find_free();
+    test_incore_find_free_null();
 
     CTEST_RESULTS();
 
