@@ -28,3 +28,9 @@ struct inode *incore_find(unsigned int inode_num)
 
     return NULL;
 }
+
+void incore_free_all()
+{
+    for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
+        incore[i].ref_count = 0;
+}

@@ -165,6 +165,7 @@ void test_alloc_fail(void)
 
 void test_incore_find_free(void)
 {
+    incore_free_all();
     struct inode *inode = incore_find_free();
 
     CTEST_ASSERT(inode->ref_count == 0, "incore_find_free returns an inode that is not in use");
@@ -172,6 +173,7 @@ void test_incore_find_free(void)
 
 void test_incore_find_free_null(void)
 {
+    incore_free_all();
     struct inode *inode = incore_find_free();
 
     for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
@@ -185,8 +187,14 @@ void test_incore_find_free_null(void)
 
 void test_incore_find(void)
 {
-    incore_find_free()->inode_num = 1;
-    incore_find_free()->inode_num = 2;
+    incore_free_all();
+    struct inode *inode = incore_find_free();
+    inode->inode_num = 1;
+    inode->ref_count = 1;
+
+    inode = incore_find_free();
+    inode->inode_num = 2;
+    inode->ref_count = 1;
 
     CTEST_ASSERT(incore_find(1)->inode_num == 1, "incore_find returns the incore inode with the given inode number");
     CTEST_ASSERT(incore_find(2)->inode_num == 2, "incore_find returns the incore inode with the given inode number");
@@ -194,6 +202,7 @@ void test_incore_find(void)
 
 void test_incore_find_null(void)
 {
+    incore_free_all();
     CTEST_ASSERT(incore_find(1) == NULL, "incore_find returns NULL if the given inode number is not in memory");
 }
 
