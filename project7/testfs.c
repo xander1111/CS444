@@ -158,15 +158,15 @@ void test_ialloc(void)
 {
     image_open("./test.txt", 1);
 
-    int bit_num = 321;
+    int bit_num = 123;
     unsigned char block[BLOCK_SIZE] = {0};
     for (int i = 0; i < BLOCK_SIZE; i++)
         block[i] = 0xFF;
 
     set_free(block, bit_num, 0);
-    bwrite(INODE_FREE_BLOCK, block);  // inode free block gets set to all 1s, except for bit 321
+    bwrite(INODE_FREE_BLOCK, block);  // inode free block gets set to all 1s, except for bit 123
 
-    CTEST_ASSERT(ialloc() == bit_num, "ialloc allocates the first free inode");
+    CTEST_ASSERT(ialloc()->inode_num = EXAMPLE_INODE_NUM, "ialloc allocates the first free inode");
 
     image_close();
 }
@@ -181,7 +181,7 @@ void test_ialloc_fail(void)
 
     bwrite(INODE_FREE_BLOCK, block);  // inode free block gets set to all 1s
 
-    CTEST_ASSERT(ialloc() == -1, "ialloc returns -1 if there are no free inodes");
+    CTEST_ASSERT(ialloc() == NULL, "ialloc returns NULL if there are no free inodes");
 
     image_close();
 }

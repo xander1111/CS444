@@ -24,5 +24,5 @@ void bwrite(int block_num, unsigned char *block)
 
 int alloc(void)
 {
-    return alloc_block(DATA_FREE_BLOCK);
+    return alloc_free(DATA_FREE_BLOCK);
 }

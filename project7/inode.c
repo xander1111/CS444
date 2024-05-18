@@ -8,9 +8,37 @@
 
 static struct inode incore[MAX_SYS_OPEN_FILES] = {0};
 
-int ialloc(void)
+struct inode *ialloc(void)
 {
-    return alloc_block(INODE_FREE_BLOCK);
+    unsigned char free_block[BLOCK_SIZE];
+    bread(INODE_FREE_BLOCK, free_block);
+
+    int first_free_index = find_free(free_block);
+
+    if (first_free_index == -1)  
+        // No free block found, don't try to write to index -1
+        return NULL;
+
+    bwrite(INODE_FREE_BLOCK, free_block);
+
+    struct inode *incore = iget(first_free_index);
+    if (incore == NULL)
+        return NULL;
+
+    set_free(free_block, first_free_index, 1);
+
+    incore->size = 0;
+    incore->owner_id = 0;
+    incore->permissions = 0;
+    incore->flags = 0;
+    for (int i = 0; i < INODE_POINTER_COUNT; i++)
+        incore->block_ptr[i] = 0;
+
+    incore->inode_num = first_free_index;
+
+    write_inode(incore);
+    
+    return incore;
 }
 
 struct inode *incore_find_free(void)
