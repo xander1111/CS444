@@ -68,8 +68,6 @@ void read_inode(struct inode *in, int inode_num)
         in->block_ptr[i] = read_u16(offset);
         offset += 2;
     }
-
-    in->inode_num = inode_num;
 }
 
 void write_inode(struct inode *in)
@@ -107,4 +105,24 @@ void write_inode(struct inode *in)
 
     memcpy(block_to_write + byte_offset, inode_buf, INODE_SIZE);
     bwrite(block_num, block_to_write);
+}
+
+struct inode *iget(int inode_num)
+{
+    struct inode *incore = incore_find(inode_num);
+    if (incore != NULL)
+    {
+        incore->ref_count++;
+        return incore;
+    }
+
+    incore = incore_find_free();
+    if (incore == NULL)
+        return NULL;
+
+    read_inode(incore, inode_num);
+    incore->ref_count = 1;
+    incore->inode_num = inode_num;
+
+    return incore;
 }
