@@ -11,7 +11,9 @@
 
 #ifdef CTEST_ENABLE
 
-unsigned char example_inode_block[4096];  // Has some inode data at inode_num 3
+#define EXAMPLE_INODE_NUM 3
+
+unsigned char example_inode_block[4096];  // Has some inode data at EXAMPLE_INODE_NUM
 
 void generate_example_inode_block(void)
 {    
@@ -38,7 +40,7 @@ void generate_example_inode_block(void)
         0x0F, 0x0F,
         0x10, 0x10
     };
-    memcpy(example_inode_block + 3 * INODE_SIZE, i, 41);
+    memcpy(example_inode_block + EXAMPLE_INODE_NUM * INODE_SIZE, i, 41);
 }
 
 // Example incore inode contains the same data as in the example inode block
@@ -55,7 +57,7 @@ struct inode *get_example_incore_inode(void)
         incore->block_ptr[i] = 0x0101 * (i + 1);
     
     incore->ref_count = 1;
-    incore->inode_num = 3;
+    incore->inode_num = EXAMPLE_INODE_NUM;
     return incore;
 }
 
@@ -284,7 +286,7 @@ void test_read_inode(void)
     setup_inode_file();
 
     struct inode to_read;
-    read_inode(&to_read, 3);
+    read_inode(&to_read, EXAMPLE_INODE_NUM);
 
     unsigned char has_same_data = to_read.size == 2864434397 &&  // 0xAABBCCDD
     to_read.owner_id == 6683 &&  // 0x1A1B
@@ -309,21 +311,21 @@ void test_iget(void)
 
     struct inode *to_read;
 
-    to_read = iget(3);
+    to_read = iget(EXAMPLE_INODE_NUM);
 
     unsigned char has_same_data = to_read->size == 2864434397 &&  // 0xAABBCCDD
     to_read->owner_id == 6683 &&  // 0x1A1B
     to_read->permissions == 0x10 &&
     to_read->flags == 0xAB &&
     to_read->link_count == 0x20 &&
-    to_read->inode_num == 3;
+    to_read->inode_num == EXAMPLE_INODE_NUM;
 
     for (int i = 0; i < INODE_POINTER_COUNT; i++)
         has_same_data &= to_read->block_ptr[i] == 0x0101 * (i + 1);
     
     CTEST_ASSERT(has_same_data, "iget read the inode from disk and returns an incore inode");
 
-    CTEST_ASSERT(iget(3) == to_read, "iget returns the existing incore inode if it's already in memory");
+    CTEST_ASSERT(iget(EXAMPLE_INODE_NUM) == to_read, "iget returns the existing incore inode if it's already in memory");
 
     image_close();
 }
@@ -357,6 +359,20 @@ void test_iput(void)
     bread(INODE_BLOCK_START, read_data);
 
     CTEST_ASSERT(memcmp(example_inode_block, read_data, BLOCK_SIZE) == 0, "iput writes the inode to disk if it gets freed");
+
+    image_close();
+}
+
+void test_iput_already_free(void)
+{
+    image_open("./test.txt", 1);
+    incore_free_all();
+
+    struct inode *incore = get_example_incore_inode();
+    incore->ref_count = 0;
+    iput(incore);
+
+    CTEST_ASSERT(incore->ref_count == 0, "iput doesn't decrement the reference count of an inode if it's already 0");
 
     image_close();
 }
@@ -396,6 +412,7 @@ int main(void)
     test_iget_null();
 
     test_iput();
+    test_iput_already_free();
 
     CTEST_RESULTS();
 
