@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS= -Wall -Wextra -Werror -g
+CCOPTS= -Wall -Wextra -Werror
 
 .PHONY: all, clean, pristine, test
 
@@ -9,6 +9,7 @@ all: testfs.o libvvsfs.a
 test: all
 	./testfs
 
+# Using a library prevents the debugger from stepping through the source files in said library. Also used so production builds don't have excess debug info
 debug: testfs.o image.o block.o free.o inode.o pack.o
 	$(CC) $(CCOPTS) -g -o testfs_debug $^
 
