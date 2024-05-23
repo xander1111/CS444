@@ -7,6 +7,7 @@
 #define DATA_FREE_BLOCK 2
 #define INODE_BLOCK_START 3
 #define INODE_BLOCK_COUNT 4
+#define FIRST_DATA_BLOCK 7
 
 unsigned char *bread(int block_num, unsigned char *block);
 void bwrite(int block_num, unsigned char *block);

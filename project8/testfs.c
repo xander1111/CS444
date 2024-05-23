@@ -7,13 +7,14 @@
 #include "block.h"
 #include "free.h"
 #include "inode.h"
+#include "dir.h"
 
 
 #ifdef CTEST_ENABLE
 
 #define EXAMPLE_INODE_NUM 3
 
-unsigned char example_inode_block[4096];  // Has some inode data at EXAMPLE_INODE_NUM
+unsigned char example_inode_block[BLOCK_SIZE];  // Has some inode data at EXAMPLE_INODE_NUM
 
 void generate_example_inode_block(void)
 {    
@@ -377,6 +378,41 @@ void test_iput_already_free(void)
     image_close();
 }
 
+void test_mkfs(void)
+{
+    image_open("./test.txt", 1);
+    incore_free_all();
+
+    // unsigned char dir_data_block[BLOCK_SIZE];
+    // unsigned char dir_data[] = {
+    //     0x00, 0x00, // inode_num of ./
+    //     '.', '.'    // filename
+    // };
+    // memcpy(dir_data_block, dir_data, 3);    // 3 bytes to only write 1 '.'
+    // bwrite(FIRST_DATA_BLOCK, dir_data_block);
+
+    // memcpy(dir_data_block, dir_data, 4);
+    // bwrite(FIRST_DATA_BLOCK + DIR_ENTRY_SIZE, dir_data_block);
+
+    mkfs();
+
+    struct inode *incore = iget(0);
+    CTEST_ASSERT(incore->flags == 2, "mkfs creates a directory at inode_num 0");
+
+    unsigned char data[BLOCK_SIZE];
+    bread(incore->block_ptr[0] + FIRST_DATA_BLOCK, data);
+
+    unsigned char has_same_data = data[0] == 0x00 && data[1] == 0x00 &&  // dir entry 0 inode_num
+    data[2] == '.' &&  // filename
+
+    data[0 + DIR_ENTRY_SIZE] == 0x00 && data[1 + DIR_ENTRY_SIZE] == 0x00 &&  // dir entry 1 inode_num
+    data[2 + DIR_ENTRY_SIZE] == '.' && data[3 + DIR_ENTRY_SIZE] == '.';  //filename
+
+    CTEST_ASSERT(has_same_data, "mkfs creates a root directory with itself as . and ..");
+
+    image_close();
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -413,6 +449,8 @@ int main(void)
 
     test_iput();
     test_iput_already_free();
+
+    test_mkfs();
 
     CTEST_RESULTS();
 

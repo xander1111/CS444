@@ -9,6 +9,10 @@
 #define INODE_POINTER_COUNT 16
 #define MAX_SYS_OPEN_FILES 64
 
+#define TYPE_UNKNOWN 0
+#define TYPE_FILE 1
+#define TYPE_DIR 2
+
 struct inode
 {
     unsigned int size;                              // offset 0
