@@ -16,5 +16,7 @@ struct directory_entry
     // TODO
 };
 
+struct directory *directory_open(int inode_num);
+
 #endif
 

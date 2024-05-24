@@ -67,6 +67,16 @@ void setup_inode_file(void)
     bwrite(INODE_BLOCK_START, example_inode_block);
 }
 
+void fill_incore_inodes(void)
+{
+    struct inode *inode;
+    for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
+    {
+        inode = incore_find_free();
+        inode->ref_count = 1;
+    }
+}
+
 void test_image_open(void)
 {
     CTEST_ASSERT(image_open("./test.txt", 1) > 0, "image_open returns a file descriptor"); 
@@ -230,13 +240,7 @@ void test_incore_find_free(void)
 
 void test_incore_find_free_null(void)
 {
-    struct inode *inode = incore_find_free();
-
-    for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
-    {
-        inode = incore_find_free();
-        inode->ref_count = 1;
-    }
+    fill_incore_inodes();
 
     CTEST_ASSERT(incore_find_free() == NULL, "incore_find_free returns NULL if no inodes are free");
     incore_free_all();
@@ -337,12 +341,7 @@ void test_iget_null(void)
 {
     image_open("./test.txt", 1);
 
-    struct inode *inode;
-    for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
-    {
-        inode = incore_find_free();
-        inode->ref_count = 1;
-    }
+    fill_incore_inodes();
 
     CTEST_ASSERT(iget(1) == NULL, "iget returns NULL if there are no free incore inodes");
 
@@ -405,6 +404,35 @@ void test_mkfs(void)
     image_close();
 }
 
+void test_dir_open(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+
+    struct directory *root = directory_open(0);
+
+    CTEST_ASSERT(root->inode != NULL, "directory_open returns a directory with an inode");
+    CTEST_ASSERT(root->offset == 0, "directory_open has a default offset of 0");
+
+    incore_free_all();
+    image_close();
+}
+
+void test_dir_open_null(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+
+    fill_incore_inodes();
+
+    struct directory *root = directory_open(10);
+
+    CTEST_ASSERT(root == NULL, "directory_open returns NULL when an error occurs");
+
+    incore_free_all();
+    image_close();
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -445,6 +473,7 @@ int main(void)
     test_mkfs();
 
     test_dir_open();
+    test_dir_open_null();
 
     CTEST_RESULTS();
 
