@@ -221,15 +221,15 @@ void test_alloc_fail(void)
 
 void test_incore_find_free(void)
 {
-    incore_free_all();
     struct inode *inode = incore_find_free();
 
     CTEST_ASSERT(inode->ref_count == 0, "incore_find_free returns an inode that is not in use");
+
+    incore_free_all();
 }
 
 void test_incore_find_free_null(void)
 {
-    incore_free_all();
     struct inode *inode = incore_find_free();
 
     for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
@@ -239,11 +239,11 @@ void test_incore_find_free_null(void)
     }
 
     CTEST_ASSERT(incore_find_free() == NULL, "incore_find_free returns NULL if no inodes are free");
+    incore_free_all();
 }
 
 void test_incore_find(void)
 {
-    incore_free_all();
     struct inode *inode = incore_find_free();
     inode->inode_num = 1;
     inode->ref_count = 1;
@@ -254,18 +254,19 @@ void test_incore_find(void)
 
     CTEST_ASSERT(incore_find(1)->inode_num == 1, "incore_find returns the incore inode with the given inode number");
     CTEST_ASSERT(incore_find(2)->inode_num == 2, "incore_find returns the incore inode with the given inode number");
+
+    incore_free_all();
 }
 
 void test_incore_find_null(void)
 {
-    incore_free_all();
     CTEST_ASSERT(incore_find(1) == NULL, "incore_find returns NULL if the given inode number is not in memory");
+    incore_free_all();
 }
 
 void test_write_inode(void)
 {
     image_open("./test.txt", 1);
-    incore_free_all();
 
     struct inode *incore = get_example_incore_inode();
 
@@ -276,13 +277,13 @@ void test_write_inode(void)
 
     CTEST_ASSERT(memcmp(example_inode_block, read_data, BLOCK_SIZE) == 0, "write_inode can write an inode to disk");
 
+    incore_free_all();
     image_close();
 }
 
 void test_read_inode(void)
 {
     image_open("./test.txt", 1);
-    incore_free_all();
 
     setup_inode_file();
 
@@ -300,13 +301,13 @@ void test_read_inode(void)
 
     CTEST_ASSERT(has_same_data, "read_inode can be used to read inodes from disk");
 
+    incore_free_all();
     image_close();
 }
 
 void test_iget(void)
 {
     image_open("./test.txt", 1);
-    incore_free_all();
 
     setup_inode_file();
 
@@ -328,13 +329,13 @@ void test_iget(void)
 
     CTEST_ASSERT(iget(EXAMPLE_INODE_NUM) == to_read, "iget returns the existing incore inode if it's already in memory");
 
+    incore_free_all();
     image_close();
 }
 
 void test_iget_null(void)
 {
     image_open("./test.txt", 1);
-    incore_free_all();
 
     struct inode *inode;
     for (int i = 0; i < MAX_SYS_OPEN_FILES; i++)
@@ -344,12 +345,13 @@ void test_iget_null(void)
     }
 
     CTEST_ASSERT(iget(1) == NULL, "iget returns NULL if there are no free incore inodes");
+
+    incore_free_all();
 }
 
 void test_iput(void)
 {
     image_open("./test.txt", 1);
-    incore_free_all();
 
     struct inode *incore = get_example_incore_inode();
     iput(incore);
@@ -361,13 +363,13 @@ void test_iput(void)
 
     CTEST_ASSERT(memcmp(example_inode_block, read_data, BLOCK_SIZE) == 0, "iput writes the inode to disk if it gets freed");
 
+    incore_free_all();
     image_close();
 }
 
 void test_iput_already_free(void)
 {
     image_open("./test.txt", 1);
-    incore_free_all();
 
     struct inode *incore = get_example_incore_inode();
     incore->ref_count = 0;
@@ -375,24 +377,13 @@ void test_iput_already_free(void)
 
     CTEST_ASSERT(incore->ref_count == 0, "iput doesn't decrement the reference count of an inode if it's already 0");
 
+    incore_free_all();
     image_close();
 }
 
 void test_mkfs(void)
 {
     image_open("./test.txt", 1);
-    incore_free_all();
-
-    // unsigned char dir_data_block[BLOCK_SIZE];
-    // unsigned char dir_data[] = {
-    //     0x00, 0x00, // inode_num of ./
-    //     '.', '.'    // filename
-    // };
-    // memcpy(dir_data_block, dir_data, 3);    // 3 bytes to only write 1 '.'
-    // bwrite(FIRST_DATA_BLOCK, dir_data_block);
-
-    // memcpy(dir_data_block, dir_data, 4);
-    // bwrite(FIRST_DATA_BLOCK + DIR_ENTRY_SIZE, dir_data_block);
 
     mkfs();
 
@@ -410,6 +401,7 @@ void test_mkfs(void)
 
     CTEST_ASSERT(has_same_data, "mkfs creates a root directory with itself as . and ..");
 
+    incore_free_all();
     image_close();
 }
 
@@ -451,6 +443,8 @@ int main(void)
     test_iput_already_free();
 
     test_mkfs();
+
+    test_dir_open();
 
     CTEST_RESULTS();
 
