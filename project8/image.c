@@ -29,7 +29,7 @@ int image_close(void)
 void mkfs(void)
 {
     struct inode *inode = ialloc();
-    int data_block_num = alloc();
+    int data_block_num = alloc() + FIRST_DATA_BLOCK;
 
     inode->flags = TYPE_DIR;
     inode->size = DIR_ENTRY_SIZE * 2;  // . and ..
@@ -55,6 +55,6 @@ void mkfs(void)
 
     strcpy((char*) offset, parent);
 
-    bwrite(data_block_num + FIRST_DATA_BLOCK, block);
+    bwrite(data_block_num, block);
     iput(inode);
 }

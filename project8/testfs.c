@@ -390,7 +390,7 @@ void test_mkfs(void)
     CTEST_ASSERT(incore->flags == 2, "mkfs creates a directory at inode_num 0");
 
     unsigned char data[BLOCK_SIZE];
-    bread(incore->block_ptr[0] + FIRST_DATA_BLOCK, data);
+    bread(incore->block_ptr[0], data);
 
     unsigned char has_same_data = data[0] == 0x00 && data[1] == 0x00 &&  // dir entry 0 inode_num
     data[2] == '.' &&  // filename
@@ -428,6 +428,31 @@ void test_dir_open_null(void)
     struct directory *root = directory_open(10);
 
     CTEST_ASSERT(root == NULL, "directory_open returns NULL when an error occurs");
+
+    incore_free_all();
+    image_close();
+}
+
+void test_dir_get(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+
+    struct directory *root = directory_open(0);
+    
+    struct directory_entry entry = {};
+
+    int err = directory_get(root, &entry);
+    char entry1;
+    strcpy(&entry1, entry.name);
+
+    CTEST_ASSERT(err == 0 && entry.name[0] != 0, "directory_get provides directory entries");
+    
+    err = directory_get(root, &entry);
+    CTEST_ASSERT(err == 0 && strcmp(entry.name, &entry1) != 0, "directory_get provides different entries when repeatedly called");
+
+    err = directory_get(root, &entry);
+    CTEST_ASSERT(err == -1, "directory_get returns -1 when there are no more entries to read");
 
     incore_free_all();
     image_close();
@@ -474,6 +499,8 @@ int main(void)
 
     test_dir_open();
     test_dir_open_null();
+
+    test_dir_get();
 
     CTEST_RESULTS();
 
