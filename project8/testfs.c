@@ -8,6 +8,7 @@
 #include "free.h"
 #include "inode.h"
 #include "dir.h"
+#include "ls.h"
 
 
 #ifdef CTEST_ENABLE
@@ -477,6 +478,18 @@ void test_dir_close(void)
     image_close();
 }
 
+void example_ls(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+    
+    puts("\nExample ls:");
+    ls();
+
+    incore_free_all();
+    image_close();
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -522,6 +535,8 @@ int main(void)
     test_dir_get();
 
     test_dir_close();
+
+    example_ls();
 
     CTEST_RESULTS();
 

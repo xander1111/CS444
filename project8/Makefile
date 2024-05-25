@@ -10,13 +10,13 @@ test: all
 	./testfs
 
 # Using a library prevents the debugger from stepping through the source files in said library. Also used so production builds don't have excess debug info
-debug: testfs.o image.o block.o free.o inode.o pack.o dir.o err.o
+debug: testfs.o image.o block.o free.o inode.o pack.o dir.o ls.o
 	$(CC) $(CCOPTS) -g -o testfs_debug $^
 
 testfs.o: testfs.c ctest.h image.h block.h free.h inode.h dir.h
 	$(CC) $(CCOPTS) -DCTEST_ENABLE -c $<
 
-libvvsfs.a: image.o block.o free.o inode.o pack.o dir.o
+libvvsfs.a: image.o block.o free.o inode.o pack.o dir.o ls.o
 	ar rcs $@ $^
 
 image.o: image.c
@@ -37,7 +37,7 @@ pack.o: pack.c
 dir.o: dir.c
 	$(CC) $(CCOPTS) -c $<
 
-err.o: err.c
+ls.o: ls.c
 	$(CC) $(CCOPTS) -c $<
 
 clean:
