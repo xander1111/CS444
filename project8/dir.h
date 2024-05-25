@@ -7,8 +7,8 @@
 
 struct directory
 {
-    struct inode *inode;  // offset 0
-    unsigned int offset;  // offset 2
+    struct inode *inode;
+    unsigned int offset;
 };
 
 struct directory_entry
@@ -19,6 +19,7 @@ struct directory_entry
 
 struct directory *directory_open(int inode_num);
 int directory_get(struct directory *dir, struct directory_entry *ent);
+void directory_close(struct directory *dir);
 
 #endif
 

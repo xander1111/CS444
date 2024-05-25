@@ -42,3 +42,8 @@ int directory_get(struct directory *dir, struct directory_entry *ent)
     return 0;
 }
 
+void directory_close(struct directory *dir)
+{
+    iput(dir->inode);
+    free(dir);
+}

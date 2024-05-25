@@ -458,6 +458,25 @@ void test_dir_get(void)
     image_close();
 }
 
+void test_dir_close(void)
+{
+    image_open("./test.txt", 1);
+
+    struct directory *root = directory_open(0);
+
+    int inode_num = root->inode->inode_num;
+    root->inode->size = 1;
+
+    directory_close(root);
+
+    incore_free_all();  // Force iget() to get the inode from disk
+    struct inode *incore = iget(inode_num);
+    CTEST_ASSERT(incore->size == 1, "directory_close updates the directory's inode on disk");
+
+    incore_free_all();
+    image_close();
+}
+
 int main(void)
 {
     CTEST_VERBOSE(1);
@@ -501,6 +520,8 @@ int main(void)
     test_dir_open_null();
 
     test_dir_get();
+
+    test_dir_close();
 
     CTEST_RESULTS();
 
