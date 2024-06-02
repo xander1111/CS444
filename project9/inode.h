@@ -13,6 +13,8 @@
 #define TYPE_FILE 1
 #define TYPE_DIR 2
 
+#define ROOT_INODE_NUM 0
+
 struct inode
 {
     unsigned int size;                              // offset 0

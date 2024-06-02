@@ -387,7 +387,7 @@ void test_mkfs(void)
 
     mkfs();
 
-    struct inode *incore = iget(0);
+    struct inode *incore = iget(ROOT_INODE_NUM);
     CTEST_ASSERT(incore->flags == 2, "mkfs creates a directory at inode_num 0");
 
     unsigned char data[BLOCK_SIZE];
@@ -410,7 +410,7 @@ void test_dir_open(void)
     image_open("./test.txt", 1);
     mkfs();
 
-    struct directory *root = directory_open(0);
+    struct directory *root = directory_open(ROOT_INODE_NUM);
 
     CTEST_ASSERT(root->inode != NULL, "directory_open returns a directory with an inode");
     CTEST_ASSERT(root->offset == 0, "directory_open has a default offset of 0");
@@ -439,7 +439,7 @@ void test_dir_get(void)
     image_open("./test.txt", 1);
     mkfs();
 
-    struct directory *root = directory_open(0);
+    struct directory *root = directory_open(ROOT_INODE_NUM);
     
     struct directory_entry entry = {};
 
@@ -463,7 +463,7 @@ void test_dir_close(void)
 {
     image_open("./test.txt", 1);
 
-    struct directory *root = directory_open(0);
+    struct directory *root = directory_open(ROOT_INODE_NUM);
 
     int inode_num = root->inode->inode_num;
     root->inode->size = 1;
@@ -473,6 +473,17 @@ void test_dir_close(void)
     incore_free_all();  // Force iget() to get the inode from disk
     struct inode *incore = iget(inode_num);
     CTEST_ASSERT(incore->size == 1, "directory_close updates the directory's inode on disk");
+
+    incore_free_all();
+    image_close();
+}
+
+void test_namei(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+
+    CTEST_ASSERT(namei("/")->inode_num == 0, "namei can get the root directory");
 
     incore_free_all();
     image_close();
@@ -535,6 +546,8 @@ int main(void)
     test_dir_get();
 
     test_dir_close();
+
+    test_namei();
 
     example_ls();
 
