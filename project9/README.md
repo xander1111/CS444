@@ -20,6 +20,8 @@ Command line:
 * `inode.h`, `inode.c`: Functions for handling inodes
 * `ctest.h`: Testing framework, available [here](https://github.com/beejjorgensen/ctest)
 * `pack.h`, `pack.c`: Functions for reading and writing integers in big endian regardless of the system. These files were provided for the project
+* `dir.h`, `dir.c`: Functions for handling directories
+* `ls.h`, `ls.c`: An ls function
 
 
 ## Data
@@ -32,6 +34,7 @@ A file (name is provided to the library, `test.txt` is used in the test suite) t
 * `image.h`
     * `image_open()` - Opens the specified image file
     * `image_close()` - Closes the currently open image file
+    * `mkfs()` - Creates a root directory in the currently open image file
 
 * `block.h`
     * `bread()` - Reads data from the currently open image into the given buffer
@@ -52,6 +55,14 @@ A file (name is provided to the library, `test.txt` is used in the test suite) t
     * `write_inode()` - Writes the given incore inode to disk
     * `iget()` - Returns an incore version of the specified inode, if it's not already in memory it will retrieve it from disk. Also handles setting the incore inode number and updating it's reference count
     * `iput()` - Removes a reference to the given inode. If this causes the inode to be freed, it also gets saved to disk.
+
+* `dir.h`
+    * `directory_open()` - Returns a struct directory that represents the open directory from a given inode number
+    * `directory_get()` - Reads the next directory entry into `*ent`, returns 0 on success, -1 on failure (no further entries to read)
+    * `directory_close()` - Closes the given struct directory
+
+* `ls.h`
+    * `ls()` - Prints out all directory entries in the root directory
 
 ## Notes
 None
