@@ -19,13 +19,12 @@ struct inode *ialloc(void)
         // No free block found, don't try to write to index -1
         return NULL;
 
-    bwrite(INODE_FREE_BLOCK, free_block);
-
     struct inode *incore = iget(first_free_index);
     if (incore == NULL)
         return NULL;
 
     set_free(free_block, first_free_index, 1);
+    bwrite(INODE_FREE_BLOCK, free_block);
 
     incore->size = 0;
     incore->owner_id = 0;
