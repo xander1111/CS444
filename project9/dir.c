@@ -7,6 +7,8 @@
 #include "pack.h"
 #include "dirbasename.h"
 
+#include <stdio.h>
+
 struct directory *directory_open(int inode_num)
 {
     struct inode *inode = iget(inode_num);
@@ -127,16 +129,31 @@ struct inode *namei(char *path)
     if (strcmp(path, "/") == 0)
         return iget(ROOT_INODE_NUM);
 
-    char *token = strchr(path, '/') + 1;
-    struct directory *root = directory_open(ROOT_INODE_NUM);
+    char *tmp = strdup(path);  // Used because strsep needs a mutable string
+    char *alloc_pointer = tmp;  // Needed to be freed later
+    char *token = strsep(&tmp, "/"); // Initializes to an empty string as there shouldn't be any chars before the first '/'
+    struct inode *search_inode = iget(ROOT_INODE_NUM);  // Start search at root
     struct directory_entry ent;
-    while (directory_get(root, &ent) != -1)
-        if (strcmp(ent.name, token) == 0)
-            return iget(ent.inode_num);
 
-    return NULL;
-    // if (token == NULL)
-    //     return iget(ROOT_INODE_NUM);
-    // else
-    //     return namei(token);
+    while ((token = strsep(&tmp, "/")) != NULL)
+    {
+        struct directory *parent_dir = directory_open(search_inode->inode_num);
+        while (directory_get(parent_dir, &ent) != -1)
+        {
+            if (strcmp(ent.name, token) == 0)
+            {
+                iput(search_inode);  // No longer need this inode
+                search_inode = iget(ent.inode_num);
+
+                goto end;
+            }
+        }
+        return NULL;
+
+        end:
+    } 
+
+    free(alloc_pointer);
+
+    return search_inode;  // The last file to be opened was the file we are looking for
 }

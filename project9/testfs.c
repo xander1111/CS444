@@ -506,6 +506,42 @@ void test_namei_1_layer(void)
     image_close();
 }
 
+void test_namei_multi_layer(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+    directory_make("/foo");
+    directory_make("/foo/bar");
+    directory_make("/foo/bar/baz");
+
+    struct directory *parent = directory_open(ROOT_INODE_NUM);
+    struct directory_entry entry;
+
+    while (directory_get(parent, &entry) != -1);
+    parent = directory_open(entry.inode_num);  // new directory '/foo' should be the last directory entry
+
+    while (directory_get(parent, &entry) != -1);
+    parent = directory_open(entry.inode_num);  // new directory '/foo/bar' should be the last directory entry
+
+    while (directory_get(parent, &entry) != -1);  // new directory '/foo/bar/baz' should be the last directory entry
+
+    CTEST_ASSERT(namei("/foo/bar/baz")->inode_num == entry.inode_num, "namei can find a directory multiple levels down");
+
+    incore_free_all();
+    image_close();
+}
+
+void test_namei_invalid(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+
+    CTEST_ASSERT(namei("/foo") == NULL, "namei returns NULL when given a filepath that does not exist");
+
+    incore_free_all();
+    image_close();
+}
+
 void test_dir_make(void)
 {
     image_open("./test.txt", 1);
@@ -531,9 +567,12 @@ void example_ls(void)
 
     directory_make("/foo");
     directory_make("/bar");
+    directory_make("/foo/baz");
 
     puts("\nExample ls:");
     ls(ROOT_INODE_NUM);
+    puts("\nls in /foo:");
+    ls(1);
 
     incore_free_all();
     image_close();
@@ -587,6 +626,8 @@ int main(void)
 
     test_namei();
     test_namei_1_layer();
+    test_namei_multi_layer();
+    test_namei_invalid();
 
     test_dir_make();
 
