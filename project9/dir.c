@@ -5,6 +5,7 @@
 #include "inode.h"
 #include "block.h"
 #include "pack.h"
+#include "dirbasename.h"
 
 struct directory *directory_open(int inode_num)
 {
@@ -46,6 +47,79 @@ void directory_close(struct directory *dir)
 {
     iput(dir->inode);
     free(dir);
+}
+
+int directory_make(char *path)
+{
+    char dir_parent_path[1024];
+    char dir_name[16];
+
+    get_dirname(path, dir_parent_path);
+    get_basename(path, dir_name);
+
+    struct inode *parent_dir = namei(dir_parent_path);
+    struct inode *new_dir = ialloc();
+    int data_block_num = alloc() + FIRST_DATA_BLOCK;
+
+
+    // Add '.' and '..' to new directory
+    unsigned char dir_data[BLOCK_SIZE];
+    unsigned char *offset = dir_data;
+    char *self = ".";
+    char *parent = "..";
+
+    // Write '.' directory entry
+    write_u16(offset, new_dir->inode_num);    
+    offset += 2;
+
+    strcpy((char*) offset, self);
+    offset += 16;
+
+    offset += DIR_ENTRY_SIZE - 2 - 16;
+
+    // Write '..' directory entry
+    write_u16(offset, parent_dir->inode_num);
+    offset += 2;
+
+    strcpy((char*) offset, parent);
+
+    new_dir->flags = TYPE_DIR;
+    new_dir->size = DIR_ENTRY_SIZE * 2;  // . and ..
+    new_dir->block_ptr[0] = data_block_num;
+
+    bwrite(data_block_num, dir_data);
+
+
+    // Add entry in parent directory
+    int parent_block = parent_dir->size / 4096;
+    int parent_block_offset = parent_dir->size % 4096;
+    unsigned char parent_data[4096];
+    int parent_data_block_num = parent_dir->block_ptr[parent_block];
+
+    if (parent_block_offset == 0)
+    {
+        // TODO allocate new block
+        parent_data_block_num++;
+    }
+    else 
+        bread(parent_data_block_num, parent_data);
+
+    // Write new entry
+    offset = parent_data + parent_block_offset;
+
+    write_u16(offset, new_dir->inode_num);
+    offset += 2;
+
+    strcpy((char*) offset, dir_name);
+
+    bwrite(parent_data_block_num, parent_data);
+
+    parent_dir->size += DIR_ENTRY_SIZE;
+
+    iput(new_dir);
+    iput(parent_dir);
+
+    return 0;
 }
 
 struct inode *namei(char *path)

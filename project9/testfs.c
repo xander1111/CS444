@@ -489,11 +489,32 @@ void test_namei(void)
     image_close();
 }
 
+void test_dir_make(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+
+    directory_make("/foo");
+
+    struct directory *root = directory_open(ROOT_INODE_NUM);
+    struct directory_entry entry;
+
+    while (directory_get(root, &entry) != -1);
+
+    CTEST_ASSERT(strcmp(entry.name, "foo") == 0, "directory_make creates a new directory and adds an entry for it to the root directory");
+
+    incore_free_all();
+    image_close();
+}
+
 void example_ls(void)
 {
     image_open("./test.txt", 1);
     mkfs();
-    
+
+    directory_make("/foo");
+    directory_make("/bar");
+
     puts("\nExample ls:");
     ls();
 
@@ -548,6 +569,8 @@ int main(void)
     test_dir_close();
 
     test_namei();
+
+    test_dir_make();
 
     example_ls();
 
