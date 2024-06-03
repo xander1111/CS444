@@ -124,6 +124,19 @@ int directory_make(char *path)
 
 struct inode *namei(char *path)
 {
-    (void)path;
-    return iget(ROOT_INODE_NUM);
+    if (strcmp(path, "/") == 0)
+        return iget(ROOT_INODE_NUM);
+
+    char *token = strchr(path, '/') + 1;
+    struct directory *root = directory_open(ROOT_INODE_NUM);
+    struct directory_entry ent;
+    while (directory_get(root, &ent) != -1)
+        if (strcmp(ent.name, token) == 0)
+            return iget(ent.inode_num);
+
+    return NULL;
+    // if (token == NULL)
+    //     return iget(ROOT_INODE_NUM);
+    // else
+    //     return namei(token);
 }

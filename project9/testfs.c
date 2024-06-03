@@ -489,6 +489,23 @@ void test_namei(void)
     image_close();
 }
 
+void test_namei_1_layer(void)
+{
+    image_open("./test.txt", 1);
+    mkfs();
+    directory_make("/foo");
+
+    struct directory *root = directory_open(ROOT_INODE_NUM);
+    struct directory_entry entry;
+
+    while (directory_get(root, &entry) != -1);
+
+    CTEST_ASSERT(namei("/foo")->inode_num == entry.inode_num, "namei can find a directory one level down");
+
+    incore_free_all();
+    image_close();
+}
+
 void test_dir_make(void)
 {
     image_open("./test.txt", 1);
@@ -516,7 +533,7 @@ void example_ls(void)
     directory_make("/bar");
 
     puts("\nExample ls:");
-    ls();
+    ls(ROOT_INODE_NUM);
 
     incore_free_all();
     image_close();
@@ -569,6 +586,7 @@ int main(void)
     test_dir_close();
 
     test_namei();
+    test_namei_1_layer();
 
     test_dir_make();
 
