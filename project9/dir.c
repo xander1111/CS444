@@ -145,10 +145,10 @@ struct inode *namei(char *path)
                 iput(search_inode);  // No longer need this inode
                 search_inode = iget(ent.inode_num);
 
-                goto end;
+                goto end;  // Can't use break as that would execute the return NULL statement
             }
         }
-        return NULL;
+        return NULL;  // No path found, return NULL
 
         end:
     } 
